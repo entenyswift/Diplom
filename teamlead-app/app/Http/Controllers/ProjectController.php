@@ -10,15 +10,31 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::with('team')->get();
+        $user = auth()->user();
+
+        // Получаем проекты, где пользователь состоит в команде
+        $projects = Project::whereHas('team.users', function ($query) use ($user) {
+            $query->where('users.id', $user->id);
+        })->with('team')->get();
+
         return view('projects.index', compact('projects'));
     }
 
+
+
     public function create()
     {
-        $teams = Team::all();
+        if (!auth()->user()->hasRole('teamlead')) {
+            abort(403, 'Только тимлиды могут создавать проекты.');
+        }
+
+        $teams = auth()->user()->teams; // Только команды, где пользователь - тимлид
+
         return view('projects.create', compact('teams'));
     }
+
+
+
 
     public function store(Request $request)
     {

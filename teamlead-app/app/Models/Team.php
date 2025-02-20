@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class Team extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'leader_id'];
+    protected $fillable = ['name', 'description', 'leader_id'];
 
     public function leader(): BelongsTo
     {
