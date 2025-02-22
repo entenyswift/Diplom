@@ -65,6 +65,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/teams/{team}', [TeamController::class, 'show'])->name('teams.show');
 });
 
+Route::middleware('auth')->group(function () {
+    Route::patch('/tasks/{task}/update-status', [DashboardController::class, 'updateStatus'])->name('tasks.update-status');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+});
 
 
 require __DIR__.'/auth.php';

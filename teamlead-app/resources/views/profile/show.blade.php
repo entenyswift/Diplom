@@ -3,6 +3,37 @@
 @section('title', 'Мой профиль')
 
 @section('content')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.kanban-column').forEach(function(column) {
+                new Sortable(column, {
+                    group: 'kanban',
+                    animation: 150,
+                    onEnd: function (evt) {
+                        let taskId = evt.item.getAttribute('data-id');
+                        let newStatus = evt.to.getAttribute('data-status');
+
+                        fetch(`/tasks/${taskId}/update-status`, {
+                            method: 'PATCH', // Laravel требует PATCH/PUT
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ status: newStatus })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.success) {
+                                    alert('Ошибка обновления статуса задачи');
+                                    location.reload(); // Перезагрузка в случае ошибки
+                                }
+                            })
+                            .catch(error => console.error('Ошибка:', error));
+                    }
+                });
+            });
+        });
+    </script>
     <div class="container">
         <h1>Профиль: {{ $user->name }}</h1>
         <p><strong>Email:</strong> {{ $user->email }}</p>
@@ -40,4 +71,5 @@
             </ul>
         @endif
     </div>
+
 @endsection

@@ -32,19 +32,16 @@ class DashboardController extends Controller
         return view('dashboard', compact('tasks', 'statistics', 'columns'));
     }
 
-    public function updateStatus(Request $request, Task $task)
+    public function updateStatus(Request $request, $taskId)
     {
         $request->validate([
             'status' => 'required|in:to_do,in_progress,paused,done',
         ]);
 
-        // Если нужно, можно проверить, что текущий пользователь действительно имеет эту задачу:
-        if (!auth()->user()->tasks->contains($task->id)) {
-            return response()->json(['success' => false, 'message' => 'Нет доступа к этой задаче'], 403);
-        }
-
+        $task = auth()->user()->tasks()->findOrFail($taskId);
         $task->update(['status' => $request->status]);
 
         return response()->json(['success' => true]);
     }
+
 }
